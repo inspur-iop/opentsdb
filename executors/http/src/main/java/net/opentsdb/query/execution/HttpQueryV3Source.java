@@ -167,8 +167,8 @@ public class HttpQueryV3Source extends AbstractQueryNode implements SourceNode {
                     .setPreviousIntervals(0)
                     .setTimeShiftInterval(null);
     }
-    
-    if (!Strings.isNullOrEmpty(config.getFilterId())) {
+
+    if (Strings.isNullOrEmpty(config.getFilterId()) || !config.getFilterId().equalsIgnoreCase("null")) {
       builder.addFilter(DefaultNamedFilter.newBuilder()
           .setId(config.getFilterId())
           .setFilter(context.query().getFilter(config.getFilterId()))
@@ -492,7 +492,6 @@ public class HttpQueryV3Source extends AbstractQueryNode implements SourceNode {
             .build());
       }
     }
-    
     client.execute(post, new ResponseCallback());
     if (context.query().isTraceEnabled()) {
       context.queryContext().logTrace(this, "Compiled and sent query to [" 
