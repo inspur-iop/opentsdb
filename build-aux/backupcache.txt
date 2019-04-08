@@ -1,0 +1,69 @@
+ /**
+     * 根据rowKey获取Token
+     * @param rowKey
+     * @return
+     */
+    public String getToken(final String rowKey){
+       try {
+            return rowKeyToken.get(rowKey, new Callable<String>() {
+
+                @Override
+                public String call() throws Exception {
+                    GetRequest request = new GetRequest(tableName.getBytes(), rowKey.getBytes(),
+                            COLUMN_FAMILY.getBytes(), TOKEN_QUALIFIER.getBytes());
+                    Deferred<String> deferred = client.get(request)
+                            .addCallback(new Callback<String, ArrayList<KeyValue>>() {
+                                @Override
+                                public String call(ArrayList<KeyValue> list) throws Exception {
+                                    if(null != list && list.size() > 0){
+                                        KeyValue kv = list.get(0);
+                                        if(kv.timestamp() > System.currentTimeMillis())
+                                            return new String(list.get(0).value());
+                                    }
+                                    return null;
+                                }
+                            });
+
+                    return null;
+                }
+            });
+        } catch(Exception e){
+            e.printStackTrace();
+            LOG.error("scan HBase acquire RowKey error:{}", e);
+        }
+
+        return null;
+    }
+
+    public String getRowKey(final String token){
+        try{
+            return tokenRowKey.get(token, new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    final  Scanner scanner = client.newScanner(tableName);
+                    scanner.setFamily(COLUMN_FAMILY);
+                    scanner.setQualifier("token");
+                    scanner.setMinTimestamp(System.currentTimeMillis()-_1_HOUR);
+                    ValueFilter tokenFilter = new ValueFilter(CompareFilter.CompareOp.EQUAL, new BinaryComparator(token.getBytes()));
+                    scanner.setFilter(tokenFilter);
+                    ArrayList<ArrayList<KeyValue>> rows = null;
+
+                    //线程阻塞直到返回所有查询结果
+                    while ((rows = scanner.nextRows(1).joinUninterruptibly()) != null){
+                        LOG.info("received a page of users.");
+                        for (ArrayList<KeyValue> row : rows) {
+                            KeyValue kv = row.get(0);
+                            return new String(kv.key());
+                        }
+                    }
+
+                    return null;
+                }
+            });
+        } catch(Exception e){
+            e.printStackTrace();
+            LOG.error("scan HBase acquire RowKey error:{}", e);
+        }
+
+        return null;
+    }

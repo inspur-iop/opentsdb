@@ -60,8 +60,8 @@
   <logger name="QueryLog" level="OFF" additivity="false">
     <appender-ref ref="QUERY_LOG"/>
   </logger>
-  <logger name="org.apache.zookeeper" level="INFO"/>
-  <logger name="org.hbase.async" level="INFO"/>
+  <logger name="org.apache.zookeeper" level="WARN"/>
+  <logger name="org.hbase.async" level="WARN"/>
   <logger name="com.stumbleupon.async" level="INFO"/>
   
   <!-- Fallthrough root logger and router -->

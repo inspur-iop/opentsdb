@@ -14,6 +14,7 @@ TSDB_TABLE=${TSDB_TABLE-'tsdb'}
 UID_TABLE=${UID_TABLE-'tsdb-uid'}
 TREE_TABLE=${TREE_TABLE-'tsdb-tree'}
 META_TABLE=${META_TABLE-'tsdb-meta'}
+USER_TABLE=${USER_TABLE-'tsdb-user'}
 BLOOMFILTER=${BLOOMFILTER-'ROW'}
 # LZO requires lzo2 64bit to be installed + the hadoop-gpl-compression jar.
 COMPRESSION=${COMPRESSION-'LZO'}
@@ -45,4 +46,7 @@ create '$TREE_TABLE',
   
 create '$META_TABLE',
   {NAME => 'name', COMPRESSION => '$COMPRESSION', BLOOMFILTER => '$BLOOMFILTER'}
+
+create '$USER_TABLE',
+  {NAME => 'u', COMPRESSION => '$COMPRESSION', BLOOMFILTER => '$BLOOMFILTER'}
 EOF
